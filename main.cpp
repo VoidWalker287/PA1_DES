@@ -16,6 +16,7 @@ int main() {
     printf("\nThree Rounds:\n");
     three_rounds(EXAMPLE_PLAIN_TEXT, EXAMPLE_ROUND_KEY);
 
+    // TODO - plain text after decryption does not match original
     return 0;
 }
 
