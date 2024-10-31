@@ -47,6 +47,7 @@ uint8_t generate_key(const uint8_t old_key) {
 
     new_key.bit0 = 0;
     new_key.bit1 = 0;
+    // TODO - finish key generation
 
     return new_key.full_byte;
 }
