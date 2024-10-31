@@ -1,7 +1,21 @@
 #include "config.h"
 #include "DES.h"
 
-#include <ios>
+/**
+ * Set the round key
+ * @param r_key the value of the round key
+ */
+void set_Round_Key(const uint8_t r_key) {
+    round_key = r_key;
+}
+
+/**
+ * Get the current round key
+ * @return the round key
+ */
+uint8_t get_Round_Key() {
+    return round_key;
+}
 
 // expand a nibble to 6 bits for DES ( 1 2 3 4 -> 1 1 2 3 4 4)
 uint8_t expand(const uint8_t nibble) {
@@ -16,6 +30,19 @@ uint8_t substitute(const uint8_t value) {
 // permutate a nibble for DES
 uint8_t permutate(const uint8_t value) {
     return (value & 0b0100) << 1 | (value & 0b1000) >> 1 | (value & 0b0001) << 1 | (value & 0b0010) >> 1;
+}
+
+// generate round key for each round
+uint8_t generate_key(const uint8_t old_key) {
+    uint8_t left_half = (old_key & 0b111000) >> 3;
+    uint8_t right_half = (old_key & 0b000111);
+
+    left_half = left_half << 1 & 0b111 | (left_half & 0b100) >> 2;
+    right_half = right_half << 1 & 0b111 | (right_half & 0b100) >> 2;
+
+    const uint8_t new_key = left_half << 3 | right_half;
+
+    return (new_key & 0b010000) << 1 | (new_key & 0b100000) >> 1 | (new_key & 0b000001) << 3 | (new_key & 0b001000) >> 1 | new_key & 0b000010 | (new_key & 0b000100) >> 2;
 }
 
 /**
@@ -47,17 +74,36 @@ uint8_t encrypt_DES(const uint8_t plain_text) {
     // XOR with left half to get new right half
     new_byte.right_nibble = old_byte.left_nibble ^ permutation;
 
+    // generate new round key
+    round_key = generate_key(round_key);
+
     return new_byte.full_byte;
 }
 
-uint8_t generate_key(const uint8_t old_key) {
-    uint8_t left_half = (old_key & 0b111000) >> 3;
-    uint8_t right_half = (old_key & 0b000111);
+// swap nibbles of a byte
+uint8_t swap_nibbles(const uint8_t value) {
+    byte v;
+    v.full_byte = value;
 
-    left_half = left_half << 1 & 0b111 | (left_half & 0b100) >> 2;
-    right_half = right_half << 1 & 0b111 | (right_half & 0b100) >> 2;
+    const uint8_t temp = v.left_nibble;
+    v.left_nibble = v.right_nibble;
+    v.right_nibble = temp;
 
-    const uint8_t new_key = left_half << 3 | right_half;
+    return v.full_byte;
+}
 
-    return (new_key & 0b010000) << 1 | (new_key & 0b100000) >> 1 | (new_key & 0b000001) << 3 | (new_key & 0b001000) >> 1 | new_key & 0b000010 | (new_key & 0b000100) >> 2;
+/**
+ * applies simplified DES encryption algorithm to 8-bit plain text
+ * @param cipher_text the input cipher text
+ * @return plain text
+ */
+uint8_t decrypt_DES(const uint8_t cipher_text) {
+    // swap left and right nibbles
+    const uint8_t swapped = swap_nibbles(cipher_text);
+
+    // DES function stays the same
+    const uint8_t new_value = encrypt_DES(swapped);
+
+    // swap nibbles again
+    return swap_nibbles(new_value);
 }

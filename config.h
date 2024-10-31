@@ -3,8 +3,9 @@
 
 #include <stdint.h>
 
+void set_Round_Key(uint8_t r_key);
+uint8_t get_Round_Key();
 uint8_t encrypt_DES(uint8_t plain_text);
-
-static uint8_t round_key = 0b00111111;
+uint8_t decrypt_DES(uint8_t cipher_text);
 
 #endif //CONFIG_H
