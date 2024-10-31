@@ -40,9 +40,15 @@ uint8_t generate_key(const uint8_t old_key) {
     left_half = left_half << 1 & 0b111 | (left_half & 0b100) >> 2;
     right_half = right_half << 1 & 0b111 | (right_half & 0b100) >> 2;
 
-    const uint8_t new_key = left_half << 3 | right_half;
+    byte temp;
+    temp.full_byte = left_half << 3 | right_half;
 
-    return (new_key & 0b010000) << 1 | (new_key & 0b100000) >> 1 | (new_key & 0b000001) << 3 | (new_key & 0b001000) >> 1 | new_key & 0b000010 | (new_key & 0b000100) >> 2;
+    byte new_key;
+
+    new_key.bit0 = 0;
+    new_key.bit1 = 0;
+
+    return new_key.full_byte;
 }
 
 /**
