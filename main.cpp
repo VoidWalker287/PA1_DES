@@ -2,7 +2,7 @@
 #include <iostream>
 
 #define EXAMPLE_PLAIN_TEXT 0b10111111
-#define EXAMPLE_ROUND_KEY 0b101011
+#define EXAMPLE_CIPHER_KEY 0b101011
 
 void one_round(uint8_t p_text, uint8_t r_key);
 void three_rounds(uint8_t p_text, uint8_t r_key);
@@ -11,12 +11,10 @@ int main() {
     printf("Simplified DES Example\n");
 
     printf("\nOne Round:\n");
-    one_round(EXAMPLE_PLAIN_TEXT, EXAMPLE_ROUND_KEY);
+    one_round(EXAMPLE_PLAIN_TEXT, EXAMPLE_CIPHER_KEY);
 
     printf("\nThree Rounds:\n");
-    three_rounds(EXAMPLE_PLAIN_TEXT, EXAMPLE_ROUND_KEY);
-
-    // TODO - plain text after decryption does not match original
+    three_rounds(EXAMPLE_PLAIN_TEXT, EXAMPLE_CIPHER_KEY);
     return 0;
 }
 

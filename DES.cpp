@@ -17,9 +17,9 @@ uint8_t get_Round_Key() {
     return round_key;
 }
 
-// expand a nibble to 6 bits for DES ( 1 2 3 4 -> 1 1 2 3 4 4)
+// expand a nibble to 6 bits for DES (3 2 1 0 -> 3 3 2 1 0 0)
 uint8_t expand(const uint8_t nibble) {
-    return ((nibble & 0b1000) << 2) | (nibble << 1) | (nibble & 0x0001);
+    return ((nibble & 0b1000) << 2) | nibble << 1 | (nibble & 0b0001);
 }
 
 // substitute right nibble using S-box
@@ -67,11 +67,21 @@ uint8_t DES(const uint8_t text, bool is_encryption) {
     //expand the right half
     uint8_t expanded = expand(old_byte.right_nibble);
 
-    // generate new round key
-    round_key = rotate_key(round_key, is_encryption);
 
-    // XOR with permutation of round key
-    expanded ^= permute_key(round_key);
+    if (is_encryption) {
+        // generate new round key
+        round_key = rotate_key(round_key, is_encryption);
+
+        // XOR with permutation of round key
+        expanded ^= permute_key(round_key);
+    } else {
+        // XOR with permutation of round key
+        expanded ^= permute_key(round_key);
+
+        // generate new round key
+        round_key = rotate_key(round_key, is_encryption);
+    }
+
 
     // perform S-box substitution
     const uint8_t substitution = substitute(expanded);
